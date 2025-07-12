@@ -1,13 +1,14 @@
 import { Component } from 'react';
 import type { Movie, MovieResponse } from '../types';
-import SearchInput from '../components/SearchInput';
-import SearchButton from '../components/SearchButton';
+import SearchControls from '../components/SearchControls';
 import Results from '../components/Results';
+import { config } from '../config';
 
 interface State {
   query: string;
   isLoading: boolean;
   results: Movie[];
+  error: unknown;
 }
 
 class MainPage extends Component<Record<string, never>, State> {
@@ -15,56 +16,62 @@ class MainPage extends Component<Record<string, never>, State> {
     query: '',
     isLoading: false,
     results: [] as Movie[],
+    error: null,
   };
 
-  handleChange = (query: string) => {
-    this.setState({ query: query });
-  };
-
-  handleSearch = async () => {
-    const { query } = this.state;
+  handleSearch = async (query: string) => {
     if (query.trim() === '') {
       return;
     }
+    this.setState({ query: query, isLoading: true, error: null });
 
-    this.setState({ isLoading: true });
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
+        `${config.BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+            Authorization: `Bearer ${config.API_KEY}`,
           },
         }
       );
-      const data: MovieResponse = await res.json();
 
+      const data: MovieResponse = await res.json();
       this.setState({ results: data.results });
     } catch (error) {
-      console.error('Error fetching search results:', error);
-      this.setState({ results: [] });
+      this.setState({ error: error, results: [] });
     } finally {
       this.setState({ isLoading: false });
     }
   };
 
+  triggerError = () => {
+    this.setState({ error: new Error() });
+  };
+
   render() {
     return (
-      <>
+      <div className="container flex flex-col gap-2 items-center">
         <div>
-          <SearchInput query={this.state.query} onChange={this.handleChange} />
-          <SearchButton onSearch={this.handleSearch} />
+          <SearchControls onSearch={this.handleSearch} />
         </div>
         {this.state.isLoading ? (
-          <div className="bg-gray-100 min-h-100 flex items-center justify-center">
+          <div className="bg-gray-100 flex min-h-100 items-center justify-center w-full">
             <p>Loading...</p>
           </div>
         ) : (
-          <Results query={this.state.query} results={this.state.results} />
+          <>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={this.triggerError}
+            >
+              Trigger error
+            </button>
+            <Results query={this.state.query} results={this.state.results} />
+          </>
         )}
-      </>
+      </div>
     );
   }
 }
