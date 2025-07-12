@@ -6,12 +6,14 @@ import Results from '../components/Results';
 
 interface State {
   query: string;
+  isLoading: boolean;
   results: Movie[];
 }
 
 class MainPage extends Component<Record<string, never>, State> {
   state = {
     query: '',
+    isLoading: false,
     results: [] as Movie[],
   };
 
@@ -25,19 +27,27 @@ class MainPage extends Component<Record<string, never>, State> {
       return;
     }
 
-    const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-        },
-      }
-    );
-    const data: MovieResponse = await res.json();
+    this.setState({ isLoading: true });
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+          },
+        }
+      );
+      const data: MovieResponse = await res.json();
 
-    this.setState({ results: data.results });
+      this.setState({ results: data.results });
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      this.setState({ results: [] });
+    } finally {
+      this.setState({ isLoading: false });
+    }
   };
 
   render() {
@@ -47,7 +57,13 @@ class MainPage extends Component<Record<string, never>, State> {
           <SearchInput query={this.state.query} onChange={this.handleChange} />
           <SearchButton onSearch={this.handleSearch} />
         </div>
-        <Results query={this.state.query} results={this.state.results} />
+        {this.state.isLoading ? (
+          <div className="bg-gray-100 min-h-100 flex items-center justify-center">
+            <p>Loading...</p>
+          </div>
+        ) : (
+          <Results query={this.state.query} results={this.state.results} />
+        )}
       </>
     );
   }
