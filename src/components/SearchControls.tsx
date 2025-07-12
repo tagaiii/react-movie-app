@@ -12,7 +12,7 @@ interface State {
 
 class SearchControls extends Component<Props, State> {
   state = {
-    query: '',
+    query: localStorage.getItem('query') || '',
   };
 
   handleChange = (query: string) => {
@@ -20,15 +20,26 @@ class SearchControls extends Component<Props, State> {
   };
 
   handleSearch = () => {
+    localStorage.setItem('query', this.state.query);
+    if (this.state.query.trim() === '') {
+      return;
+    }
     this.props.onSearch(this.state.query);
   };
 
+  componentDidMount(): void {
+    const { query } = this.state;
+    if (query) {
+      this.props.onSearch(query);
+    }
+  }
+
   render() {
     return (
-      <>
+      <div className="flex gap-2 items-center">
         <SearchInput query={this.state.query} onChange={this.handleChange} />
         <SearchButton onSearch={this.handleSearch} />
-      </>
+      </div>
     );
   }
 }

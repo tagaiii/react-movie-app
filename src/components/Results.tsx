@@ -17,7 +17,7 @@ class Results extends Component<Props> {
           <h1 className="text-xl font-bold">Search Results for "{query}"</h1>
           <hr />
           {results.length > 0 ? (
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {results.map((movie) => (
                 <MovieCard movie={movie} key={movie.id} />
               ))}

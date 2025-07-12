@@ -61,15 +61,15 @@ class MainPage extends Component<Record<string, never>, State> {
             <p>Loading...</p>
           </div>
         ) : (
-          <>
+          <div className="flex flex-col gap-2 self-stretch">
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 self-end"
               onClick={this.triggerError}
             >
               Trigger error
             </button>
             <Results query={this.state.query} results={this.state.results} />
-          </>
+          </div>
         )}
       </div>
     );
