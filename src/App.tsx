@@ -1,8 +1,13 @@
 import './App.css';
 import MainPage from './pages/MainPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
-  return <MainPage />;
+  return (
+    <ErrorBoundary>
+      <MainPage />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

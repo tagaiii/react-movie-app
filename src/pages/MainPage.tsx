@@ -9,6 +9,7 @@ interface State {
   isLoading: boolean;
   results: Movie[];
   error: unknown;
+  simulateError: boolean;
 }
 
 class MainPage extends Component<Record<string, never>, State> {
@@ -17,6 +18,7 @@ class MainPage extends Component<Record<string, never>, State> {
     isLoading: false,
     results: [] as Movie[],
     error: null,
+    simulateError: false,
   };
 
   handleSearch = async (query: string) => {
@@ -40,17 +42,21 @@ class MainPage extends Component<Record<string, never>, State> {
       const data: MovieResponse = await res.json();
       this.setState({ results: data.results });
     } catch (error) {
-      this.setState({ error: error, results: [] });
+      this.setState({ error: error, results: [], isLoading: false });
     } finally {
       this.setState({ isLoading: false });
     }
   };
 
   triggerError = () => {
-    this.setState({ error: new Error() });
+    this.setState({ simulateError: true });
   };
 
   render() {
+    if (this.state.simulateError) {
+      throw new Error('Simulated error for testing ErrorBoundary');
+    }
+
     return (
       <div className="container flex flex-col gap-2 items-center">
         <div>
@@ -68,7 +74,14 @@ class MainPage extends Component<Record<string, never>, State> {
             >
               Trigger error
             </button>
-            <Results query={this.state.query} results={this.state.results} />
+            {this.state.error ? (
+              <div className="bg-red-100 text-red-700 p-4 rounded min-h-[400px] flex flex-col items-center justify-center">
+                <h1 className="text-lg font-bold">Failed to fetch</h1>
+                <p className="text-sm">Please try again later.</p>
+              </div>
+            ) : (
+              <Results query={this.state.query} results={this.state.results} />
+            )}
           </div>
         )}
       </div>
