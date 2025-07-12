@@ -1,11 +1,7 @@
 import type { Movie } from '../types';
-import { config } from '../config';
+import { apiService } from '../services/apiService';
 
 export const MovieCard = ({ movie }: { movie: Movie }) => {
-  const getMovieImageUrl = (path: string) => {
-    return `${config.IMAGE_URL}${path}`;
-  };
-
   const maxTitleLength = 100;
   const truncatedOverview =
     movie.overview.length > maxTitleLength
@@ -25,7 +21,7 @@ export const MovieCard = ({ movie }: { movie: Movie }) => {
         )}
       </div>
       <img
-        src={getMovieImageUrl(movie.poster_path || '')}
+        src={apiService.fetchMovieImageURL(movie.poster_path || '')}
         alt={`${movie.title} poster`}
         className="mt-2 rounded"
         style={{ width: '100%', height: 'auto' }}

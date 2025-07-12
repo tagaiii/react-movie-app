@@ -27,6 +27,18 @@ class Results extends Component<Props> {
           )}
         </div>
       );
+    } else if (results.length > 0) {
+      return (
+        <div className="bg-gray-100 flex flex-col p-4">
+          <h1 className="text-xl font-bold">Popular Movies</h1>
+          <hr />
+          <div className="mt-4 flex flex-wrap gap-3 justify-center">
+            {results.map((movie) => (
+              <MovieCard movie={movie} key={movie.id} />
+            ))}
+          </div>
+        </div>
+      );
     } else {
       return (
         <div className="bg-gray-100 min-h-100 flex items-center justify-center self-stretch">

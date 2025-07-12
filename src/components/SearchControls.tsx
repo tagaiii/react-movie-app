@@ -27,13 +27,6 @@ class SearchControls extends Component<Props, State> {
     this.props.onSearch(this.state.query);
   };
 
-  componentDidMount(): void {
-    const { query } = this.state;
-    if (query) {
-      this.props.onSearch(query);
-    }
-  }
-
   render() {
     return (
       <div className="flex gap-2 items-center">

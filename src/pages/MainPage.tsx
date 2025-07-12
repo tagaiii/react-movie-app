@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import type { Movie, MovieResponse } from '../types';
+import type { Movie } from '../types';
 import SearchControls from '../components/SearchControls';
 import Results from '../components/Results';
-import { config } from '../config';
+import { apiService } from '../services/apiService';
 
 interface State {
   query: string;
@@ -28,19 +28,8 @@ class MainPage extends Component<Record<string, never>, State> {
     this.setState({ query: query, isLoading: true, error: null });
 
     try {
-      const res = await fetch(
-        `${config.BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${config.API_KEY}`,
-          },
-        }
-      );
-
-      const data: MovieResponse = await res.json();
-      this.setState({ results: data.results });
+      const data = await apiService.searchMovies(query);
+      this.setState({ results: data });
     } catch (error) {
       this.setState({ error: error, results: [], isLoading: false });
     } finally {
@@ -51,6 +40,24 @@ class MainPage extends Component<Record<string, never>, State> {
   triggerError = () => {
     this.setState({ simulateError: true });
   };
+
+  async componentDidMount(): Promise<void> {
+    this.setState({ isLoading: true, error: null });
+
+    const savedQuery = localStorage.getItem('query');
+    if (savedQuery) {
+      this.handleSearch(savedQuery);
+    } else {
+      try {
+        const data = await apiService.fetchMovies();
+        this.setState({ results: data });
+      } catch (error) {
+        this.setState({ error: error, results: [], isLoading: false });
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    }
+  }
 
   render() {
     if (this.state.simulateError) {
