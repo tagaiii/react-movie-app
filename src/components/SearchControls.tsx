@@ -21,9 +21,6 @@ class SearchControls extends Component<Props, State> {
 
   handleSearch = () => {
     localStorage.setItem('query', this.state.query);
-    if (this.state.query.trim() === '') {
-      return;
-    }
     this.props.onSearch(this.state.query);
   };
 

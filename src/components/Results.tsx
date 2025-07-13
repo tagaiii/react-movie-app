@@ -10,6 +10,7 @@ interface Props {
 class Results extends Component<Props> {
   render() {
     const { query, results } = this.props;
+    console.log(query, results);
 
     if (query) {
       return (
