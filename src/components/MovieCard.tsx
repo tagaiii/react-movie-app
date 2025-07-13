@@ -1,5 +1,5 @@
 import type { Movie } from '../types';
-import { apiService } from '../services/apiService';
+import { moviesApi } from '@src/services/movies/movies-api';
 
 export const MovieCard = ({ movie }: { movie: Movie }) => {
   const maxTitleLength = 100;
@@ -21,7 +21,7 @@ export const MovieCard = ({ movie }: { movie: Movie }) => {
         )}
       </div>
       <img
-        src={apiService.fetchMovieImageURL(movie.poster_path || '')}
+        src={moviesApi.fetchMovieImageURL(movie.posterPath || '')}
         alt={`${movie.title} poster`}
         className="mt-2 rounded"
         style={{ width: '100%', height: 'auto' }}

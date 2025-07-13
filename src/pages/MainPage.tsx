@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import type { Movie } from '../types';
+import type { Movie, Paginated } from '../types';
 import SearchControls from '../components/SearchControls';
 import Results from '../components/Results';
-import { apiService } from '../services/apiService';
+import { moviesApi } from '@src/services/movies/movies-api';
 
 interface State {
   query: string;
@@ -12,14 +12,16 @@ interface State {
   simulateError: boolean;
 }
 
+const initialState: State = {
+  query: '',
+  isLoading: false,
+  results: [],
+  error: null,
+  simulateError: false,
+};
+
 class MainPage extends Component<Record<string, never>, State> {
-  state = {
-    query: '',
-    isLoading: false,
-    results: [] as Movie[],
-    error: null,
-    simulateError: false,
-  };
+  state = initialState;
 
   handleSearch = async (query: string) => {
     if (query.trim() === '') {
@@ -28,10 +30,10 @@ class MainPage extends Component<Record<string, never>, State> {
     this.setState({ query: query, isLoading: true, error: null });
 
     try {
-      const data = await apiService.searchMovies(query);
-      this.setState({ results: data });
+      const data: Paginated<Movie> = await moviesApi.searchMovies(query);
+      this.setState({ results: data.results });
     } catch (error) {
-      this.setState({ error: error, results: [], isLoading: false });
+      this.setState({ ...initialState, error: error });
     } finally {
       this.setState({ isLoading: false });
     }
@@ -49,8 +51,8 @@ class MainPage extends Component<Record<string, never>, State> {
       this.handleSearch(savedQuery);
     } else {
       try {
-        const data = await apiService.fetchMovies();
-        this.setState({ results: data });
+        const data: Paginated<Movie> = await moviesApi.fetchMovies();
+        this.setState({ results: data.results });
       } catch (error) {
         this.setState({ error: error, results: [], isLoading: false });
       } finally {
