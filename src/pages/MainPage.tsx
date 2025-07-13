@@ -24,6 +24,8 @@ class MainPage extends Component<Record<string, never>, State> {
   state = initialState;
 
   handleSearch = async (query: string) => {
+    this.setState({ query: query, isLoading: true, error: null });
+
     if (query.trim() === '') {
       try {
         const data: Paginated<Movie> = await moviesApi.fetchMovies();
@@ -35,7 +37,6 @@ class MainPage extends Component<Record<string, never>, State> {
       }
       return;
     }
-    this.setState({ query: query, isLoading: true, error: null });
 
     try {
       const data: Paginated<Movie> = await moviesApi.searchMovies(query);
